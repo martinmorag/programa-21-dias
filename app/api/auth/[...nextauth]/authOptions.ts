@@ -4,7 +4,6 @@ import { prisma } from '@/app/lib/prisma'; // Adjust the path if needed
 import bcrypt from 'bcrypt';
 import type { NextAuthOptions } from 'next-auth';
 import type { User as NextAuthUser } from 'next-auth';
-import { JWT } from 'next-auth/jwt';
 import { z } from 'zod';
 import dayjs from 'dayjs';
 
@@ -43,7 +42,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Formato de ingreso no válido');
         }
 
-        const { email, password } = credentials;
+        const { email } = credentials;
 
         const user = await prisma.usuarios.findUnique({
           where: { email },
