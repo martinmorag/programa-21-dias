@@ -15,11 +15,6 @@ interface CustomUser extends NextAuthUser {
   id: string;
 }
 
-interface CustomToken extends JWT {
-  id?: string;
-}
-
-
 const CredentialsSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6), // Adjust the minimum length as needed
