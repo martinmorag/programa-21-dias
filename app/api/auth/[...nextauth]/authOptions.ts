@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
           where: { email },
         });
 
-        // const plainTextPassword = 'soyadministrador';  // This should be a securely entered password
+        // const plainTextPassword = 'contraseña';  // This should be a securely entered password
         // const saltRounds = 10;  // Number of bcrypt salt rounds
         // const hashedPassword = await bcrypt.hash(plainTextPassword, saltRounds);
         // console.log("this is the pasword")
