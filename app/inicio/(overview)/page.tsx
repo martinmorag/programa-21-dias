@@ -22,7 +22,7 @@ const Page : React.FC = () => {
             layout="responsive"
             >
             </Image>
-            <div className="flex flex-col justify-center items-center relative w-full h-[13rem] bg-[#cbb26a]">
+            <div className="flex flex-col justify-center items-center relative w-full h-[13rem] bg-[#EB9C47]">
                 <h1 className="text-2xl text-bold mb-2">¡Bienvenido a Programa 21 Días!</h1>
                 <p className="text-lg w-[75%] text-center mt-2">Aquí comienza tu camino hacia el éxito: juntos impulsaremos tu negocio, alcanzaremos nuevas metas y lograremos resultados en tan solo 21 días. ¡Es hora de crecer!</p>
             </div>
@@ -47,7 +47,7 @@ const Page : React.FC = () => {
                         )
                 })}</ul>
             </div>
-            <div className="flex flex-col items-center justify-center mt-10 w-full h-[12rem] bg-amber-600">
+            <div className="flex flex-col items-center justify-center mt-10 w-full h-[12rem] bg-[#E78823]">
                 <h3 className="text-2xl mb-8">Descubra el Equipo</h3>
                 <ul className="list-none w-[75%] text-lg">
                     <li className="before:content-['■'] before:mr-2 before:text-black">Inspírese con las historias de personas en distintas etapas de su camino empresarial.</li>
