@@ -1,23 +1,28 @@
-"use client";
+import { poppins } from "@/lib/fonts"
+import "./globals.css"
+import Header from "@/ui/general/Header"
+import { Providers } from "@/ui/auth/Providers"
 
-import { poppins } from "@/app/lib/fonts";
-import { SessionProvider } from 'next-auth/react';
-import "./globals.css";
+import { Metadata } from "next";
+
+export const metadata : Metadata = {
+    title: "Inicio",
+    description: "Programa 21 Días: Impulsa tu negocio, transforma tu futuro"
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en">
-        <SessionProvider>
-          <body
-            className={`${poppins.className} antialiased`}
-          >
-            {children}
-          </body>
-        </SessionProvider>
+    <html lang="es">
+      <body className={`${poppins.className}`}>
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
+      </body>
     </html>
-  );
+  )
 }

@@ -18,13 +18,17 @@ model usuarios {
   default_picture String? @default("profile") @db.VarChar(50)
   accesos_directos Json? @db.JsonB
   created_at DateTime @default(now()) @db.Timestamptz
+  plan       TipoPlan     
+  passwordResetToken String?   @unique
+  passwordResetExpires DateTime? 
 
   attempts login_attempts[]
+  progreso ProgresoRecurso[]
 }
 
 model login_attempts {
   id          String    @id @default(uuid())
-  usuarioid   String
+  usuarioid   String    @db.Uuid
   attemptedat DateTime  @default(now())
   success     Boolean
   ipaddress   String?
@@ -32,4 +36,60 @@ model login_attempts {
   reason      String?
 
   usuarios    usuarios  @relation(fields: [usuarioid], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+enum TipoRecurso {
+  VIDEO
+  PDF
+  QUIZ
+}
+
+enum TipoTema {
+  EMPRENDEDOR
+  PERSONAL
+}
+
+enum TipoPlan {
+  EMPRENDEDOR
+  EMPRENDEDOR_Y_PERSONAL
+}
+
+model Tema {
+  id          String      @id @default(uuid()) @db.Uuid
+  nombre      String      @db.VarChar(100)
+  descripcion String?
+  orden       Int         @unique 
+  tipo        TipoTema    @default(EMPRENDEDOR)
+  
+  recursos    Recurso[]
+}
+
+model Recurso {
+  id          String       @id @default(uuid()) @db.Uuid
+  titulo      String       @db.VarChar(255)
+  tipo        TipoRecurso
+  url         String?      // Para videos o PDFs
+  contenido   Json?        @db.JsonB
+  orden       Int
+  
+  temaId      String       @db.Uuid
+  tema        Tema         @relation(fields: [temaId], references: [id])
+  
+  progreso    ProgresoRecurso[]
+  
+  @@unique([temaId, orden]) 
+}
+
+model ProgresoRecurso {
+  usuarioId   String   @db.Uuid
+  recursoId   String   @db.Uuid
+  
+  completado  Boolean  @default(false)
+  completadoEn DateTime? @db.Timestamptz
+  
+  usuario     usuarios  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  recurso     Recurso   @relation(fields: [recursoId], references: [id], onDelete: Cascade)
+  
+  // Clave compuesta para asegurar que cada usuario solo pueda tener un registro por recurso
+  @@id([usuarioId, recursoId])
 }

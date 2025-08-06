@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "TipoPlan" AS ENUM ('EMPRENDEDOR', 'EMPRENDEDOR_Y_PERSONAL');
+
+-- AlterTable
+ALTER TABLE "usuarios" ADD COLUMN     "plan" "TipoPlan" NOT NULL DEFAULT 'EMPRENDEDOR';

@@ -6,20 +6,22 @@ import { getToken } from 'next-auth/jwt';
 const secret = process.env.NEXTAUTH_SECRET;
 
 export async function middleware(req: NextRequest) {
-    // Get the token from the request
     const token = await getToken({ req, secret });
 
-    // Check if the user is authenticated or not
-    if (!token && req.nextUrl.pathname.startsWith('/inicio')) {
-        // Redirect to the sign-in page if the user is not authenticated and trying to access '/panel' routes
-        return NextResponse.redirect(new URL('/', req.url));
+    const { pathname } = req.nextUrl;
+
+    // Redirect to the sign-in page if the user is not authenticated and trying to access '/inicio' or other protected routes
+    if (!token && (pathname === '/inicio' || pathname.startsWith('/inicio/'))) {
+        return NextResponse.redirect(new URL('/ingreso', req.url));
     }
 
-    // Allow the request to proceed if authenticated or the request is not for '/panel' routes
     return NextResponse.next();
 }
 
 // Define which paths this middleware should be applied to
 export const config = {
-    matcher: ['/inicio/:path*', '/'], // Apply middleware to paths starting with '/panel'
+    matcher: [
+      '/inicio',
+      '/inicio/:path*',
+    ], 
 };
