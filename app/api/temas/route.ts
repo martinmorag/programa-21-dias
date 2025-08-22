@@ -18,20 +18,29 @@ export async function GET() {
     }
     const userId = session.user.id;
 
-    const user = await prisma.usuarios.findUnique({
-      where: { id: userId },
-      select: { plan: true },
+    const userSubscription = await prisma.suscripcion.findFirst({
+      where: {
+        userId: userId,
+        status: 'active',
+        endDate: { gte: new Date() },
+      },
+      include: {
+        plan: true,
+      },
+      orderBy: { endDate: 'desc' },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    if (!userSubscription || !userSubscription.plan) {
+      return NextResponse.json({ error: 'Active subscription not found' }, { status: 403 });
     }
 
-    // 2. Determine the themes to fetch based on the user's plan
+    const userPlanName = userSubscription.plan.code;
+
+    // 3. Determine the themes to fetch based on the user's plan
     let whereClause: TemaWhereClause;
-    if (user.plan === 'EMPRENDEDOR') {
+    if (userPlanName === 'emprendedor') {
       whereClause = { tipo: 'EMPRENDEDOR' };
-    } else if (user.plan === 'EMPRENDEDOR_Y_PERSONAL') {
+    } else if (userPlanName === 'emprendedorpersonal') {
       whereClause = {
         tipo: {
           in: ['EMPRENDEDOR', 'PERSONAL'],
@@ -47,7 +56,10 @@ export async function GET() {
       orderBy: { orden: 'asc' },
       include: {
         recursos: {
+          orderBy: { orden: 'asc' },
           include: {
+            video: true, // Include the related video data
+            preguntas: true, // Include the related questions data
             progreso: {
               where: { usuarioId: userId },
               select: { completado: true },

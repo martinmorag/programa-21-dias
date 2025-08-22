@@ -24,12 +24,14 @@ declare module 'next-auth' {
    */
   interface User {
     id: string;
+    lastname?: string | null;
     rememberMe: boolean;
   }
 
   interface Session {
     user: {
       id: string;
+      lastname?: string | null;
       rememberMe: boolean;
     } & DefaultSession["user"];
   }
@@ -42,6 +44,7 @@ declare module 'next-auth/jwt' {
    */
   interface JWT {
     id: string;
+    lastname?: string | null;
     rememberMe: boolean;
   }
 }

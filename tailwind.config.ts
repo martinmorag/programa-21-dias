@@ -9,7 +9,12 @@ export default {
     "./ui/**/*.{js,ts,jsx,tsx,mdx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'vivaldi': ['Vivaldi'],
+        'copperplategothic': ['Copper Plate Gothic Bold'],
+      }
+    },
   },
   variants: {},
   plugins: [],

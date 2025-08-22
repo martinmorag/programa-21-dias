@@ -18,7 +18,7 @@ model usuarios {
   default_picture String? @default("profile") @db.VarChar(50)
   accesos_directos Json? @db.JsonB
   created_at DateTime @default(now()) @db.Timestamptz
-  plan       TipoPlan     
+  subscriptions Suscripcion[] 
   passwordResetToken String?   @unique
   passwordResetExpires DateTime? 
 
@@ -38,10 +38,27 @@ model login_attempts {
   usuarios    usuarios  @relation(fields: [usuarioid], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
-enum TipoRecurso {
-  VIDEO
-  PDF
-  QUIZ
+model Plan {
+  id      String   @id @default(uuid()) @db.Uuid
+  name    String   @unique @db.VarChar(100)
+  code    String @unique @db.VarChar(100)
+  price   Float
+
+  subscriptions Suscripcion[]
+}
+
+model Suscripcion {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  planId    String   @db.Uuid
+  startDate DateTime @default(now()) @db.Timestamptz
+  endDate   DateTime @db.Timestamptz
+  status    String   @default("pending") @db.VarChar(50) // e.g., "active", "pending", "canceled"
+
+  usuarios usuarios @relation(fields: [userId], references: [id])
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@unique([userId, planId])
 }
 
 enum TipoTema {
@@ -49,35 +66,58 @@ enum TipoTema {
   PERSONAL
 }
 
-enum TipoPlan {
-  EMPRENDEDOR
-  EMPRENDEDOR_Y_PERSONAL
-}
-
 model Tema {
   id          String      @id @default(uuid()) @db.Uuid
   nombre      String      @db.VarChar(100)
   descripcion String?
-  orden       Int         @unique 
+  orden       Int         
   tipo        TipoTema    @default(EMPRENDEDOR)
   
   recursos    Recurso[]
 }
 
 model Recurso {
-  id          String       @id @default(uuid()) @db.Uuid
-  titulo      String       @db.VarChar(255)
-  tipo        TipoRecurso
-  url         String?      // Para videos o PDFs
-  contenido   Json?        @db.JsonB
-  orden       Int
+  id      String @id @default(uuid()) @db.Uuid
+  titulo  String @db.VarChar(255)
+  orden   Int
+  temaId  String @db.Uuid
+  tema    Tema   @relation(fields: [temaId], references: [id])
   
-  temaId      String       @db.Uuid
-  tema        Tema         @relation(fields: [temaId], references: [id])
+  // Relations to other content models
+  video    Video?
+  pdf      Pdf?
+  preguntas Pregunta[]
   
-  progreso    ProgresoRecurso[]
+  // Progress
+  progreso ProgresoRecurso[]
   
-  @@unique([temaId, orden]) 
+  @@unique([temaId, orden])
+}
+
+model Video {
+  id        String  @id @default(uuid()) @db.Uuid
+  url       String  @db.VarChar(255)
+  recursoId String  @unique @db.Uuid
+  recurso   Recurso @relation(fields: [recursoId], references: [id], onDelete: Cascade)
+}
+
+model Pdf {
+  id        String  @id @default(uuid()) @db.Uuid
+  url       String  @db.VarChar(255) // URL to the PDF file
+  recursoId String  @unique @db.Uuid
+  recurso   Recurso @relation(fields: [recursoId], references: [id], onDelete: Cascade)
+}
+
+model Pregunta {
+  id        String  @id @default(uuid()) @db.Uuid
+  texto     String  @db.VarChar(255)
+  opciones  Json    @db.JsonB
+  respuesta String  @db.VarChar(255)
+  orden     Int
+  recursoId String  @db.Uuid
+  recurso   Recurso @relation(fields: [recursoId], references: [id], onDelete: Cascade)
+
+  @@unique([recursoId, orden])
 }
 
 model ProgresoRecurso {

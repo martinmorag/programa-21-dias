@@ -14,6 +14,20 @@
   }
 }
 
+@font-face {
+  font-family: 'Vivaldi';
+  src: url('/fuentes/VIVALDII.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Copper Plate Gothic Bold';
+  src: url('/fuentes/copperplategothic_bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);

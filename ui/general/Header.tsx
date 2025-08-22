@@ -56,6 +56,9 @@ const Header: React.FC = () => {
                         Inicio
                     </Link>
                 )}
+                <Link href="/contacto" className="text-gray-600 dark:text-gray-400 font-semibold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                    Contacto
+                </Link>
             </div>
 
             <div className="flex items-center space-x-4">

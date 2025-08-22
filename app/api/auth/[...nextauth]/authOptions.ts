@@ -94,6 +94,7 @@ export const authOptions: NextAuthOptions = {
         return {
           id: user.id.toString(),
           name: user.name,
+          lastname: user.lastname,
           email: user.email,
           rememberMe: credentials.rememberMe === 'true',
         };
@@ -110,8 +111,11 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name;
+        token.lastname = user.lastname; 
+        token.email = user.email;
         token.rememberMe = user.rememberMe;
-       const expirationTime = user.rememberMe ? longSessionMaxAge : shortSessionMaxAge;
+        const expirationTime = user.rememberMe ? longSessionMaxAge : shortSessionMaxAge;
         token.exp = Math.floor(Date.now() / 1000) + expirationTime;
       }
       return token;
@@ -122,6 +126,9 @@ export const authOptions: NextAuthOptions = {
       }
       if (token.rememberMe) {
         session.user.rememberMe = token.rememberMe as boolean;
+      }
+      if (token.lastname) {
+          session.user.lastname = token.lastname as string;
       }
       return session;
     },

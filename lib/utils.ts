@@ -1,5 +1,3 @@
-import { TipoTema } from "@prisma/client";
-
 export const items = [
     { name: "Día 1", nombre: "La Visión del Éxito", href: "#" },
     { name: "Día 2", nombre: "Identificando tu Propósito", href: "#" },
@@ -41,21 +39,26 @@ export const people = [
 
 
 
-export interface Recurso {
+export type Recurso = {
   id: string;
   titulo: string;
-  completado: boolean;
-}
-
-export interface Tema {
-  id: string;
-  nombre: string;
-  descripcion: string | null;
   orden: number;
-  tipo: TipoTema;
+  temaId: string;
+  video: Video | null;
+  pdf: Pdf | null;
+  preguntas: Pregunta[]; // Now explicitly an array of Pregunta objects
+  progreso: ProgresoRecurso[];
+};
+
+export type Tema = {
+  id: string;
+  orden: number;
+  nombre: string;
+  descripcion: string;
+  tipo: 'EMPRENDEDOR' | 'PERSONAL';
   progresoGeneral: number;
   recursos: Recurso[];
-}
+};
 
 
 
@@ -70,4 +73,52 @@ export interface TemaPageProps {
 
 export interface ProgressProps {
   value: number;
+}
+
+export type PropsQuiz = {
+  recursoId: string;
+  preguntas: Pregunta[];
+  isCompleted: boolean;
+};
+
+export type Pregunta = {
+  id: string;
+  texto: string;
+  opciones: Opcion[] | null; 
+  respuesta: string;
+  orden: number;
+  recursoId: string;
+};
+
+export type Opcion = {
+  id: string;
+  texto: string;
+};
+
+export type Video = {
+  id: string;
+  url: string;
+  recursoId: string;
+};
+
+export type Pdf = {
+  id: string;
+  url: string;
+  recursoId: string;
+};
+
+export type ProgresoRecurso = {
+  completado: boolean;
+};
+
+
+
+
+// Payments
+
+export interface Plan {
+  id: string;
+  name: string;
+  price: number;
+  code: string;
 }
