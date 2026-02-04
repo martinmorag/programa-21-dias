@@ -7,6 +7,68 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+
+// model User {
+//   id         String   @id @default(uuid()) @db.Uuid
+//   name       String   @db.VarChar(100)
+//   email      String   @unique @db.VarChar(200)
+//   password   String   @db.VarChar(200)
+//   userType   String   @db.VarChar(50)
+
+//   package    Package[]
+// }
+
+// model Package {
+//   id          String  @id @default(uuid()) @db.Uuid
+//   ETA         DateTime
+//   weight      Float
+//   fragile     Boolean
+//   dispatchDate DateTime
+//   notes       String? @db.VarChar(250)
+
+//   userId      String  @db.Uuid
+//   statusId    String  @db.Uuid
+//   destinationId String @db.Uuid
+//   locationId  String @db.Uuid
+//   originId    String @db.Uuid
+
+//   user        User    @relation(fields: [userId], references: [id]) 
+//   status      PackageStatus @relation(fields: [statusId], references: [id])
+//   destination Address @relation(fields: [destinationId], references: [id])
+//   location    Location @relation("locationfk", fields: [locationId], references: [id])
+//   origin      Location @relation("originfk", fields: [originId], references: [id])
+// }
+
+// model PackageStatus {
+//   id          String  @id @default(uuid()) @db.Uuid
+//   arrived     String  @db.VarChar(100)
+//   canceled    String  @db.VarChar(100)
+//   transit     String  @db.VarChar(100)
+
+//   package     Package[]
+// }
+
+// model Location {
+//   id          String  @id @default(uuid()) @db.Uuid
+//   name        String @db.VarChar(150)
+
+//   location    Package[] @relation("locationfk")
+//   origin      Package[] @relation("originfk") 
+
+// }
+
+// model Address {
+//   id          String  @id @default(uuid()) @db.Uuid
+//   name        String @db.VarChar(150)
+
+//   package     Package[]
+// }
+
+
+
+
+
 model usuarios {
   id         String   @id @default(uuid()) @db.Uuid
   name       String   @db.VarChar(100)
@@ -24,6 +86,9 @@ model usuarios {
 
   attempts login_attempts[]
   progreso ProgresoRecurso[]
+  
+  examenes             ExamenIntento[]
+  examenCompletado     Boolean           @default(false)
 }
 
 model login_attempts {
@@ -45,6 +110,9 @@ model Plan {
   price   Float
 
   subscriptions Suscripcion[]
+  examenes        Examen?
+  examenesIntento ExamenIntento[]
+  clasesBonus       ClaseBonus[]
 }
 
 model Suscripcion {
@@ -61,6 +129,44 @@ model Suscripcion {
   @@unique([userId, planId])
 }
 
+model ExamenIntento {
+  id           String    @id @default(uuid()) @db.Uuid
+  usuarioId    String    @db.Uuid
+  planId       String    @db.Uuid
+  puntaje      Float?
+  aprobado     Boolean   @default(false)
+  fechaIntento DateTime  @default(now()) @db.Timestamptz
+
+  usuario      usuarios @relation(fields: [usuarioId], references: [id])
+  plan         Plan     @relation(fields: [planId], references: [id])
+}
+
+
+model Examen {
+  id           String   @id @default(uuid()) @db.Uuid
+  planCode     String   @unique @db.VarChar(100)
+  plan         Plan     @relation(fields: [planCode], references: [code])
+  preguntas    ExamenPregunta[]
+}
+
+model ExamenPregunta {
+  id                     String           @id @default(uuid()) @db.Uuid
+  pregunta               String           @db.VarChar(255)
+  opciones               ExamenOpcion[]
+  respuestaCorrecta      ExamenOpcion?     @relation("ExamenRespuestaCorrecta", fields: [respuestaCorrectaId], references: [id])
+  respuestaCorrectaId    String?           @unique @db.Uuid // This field holds the ID of the correct option
+  examenId               String           @db.Uuid
+  examen                 Examen           @relation(fields: [examenId], references: [id])
+}
+
+model ExamenOpcion {
+  id           String         @id @default(uuid()) @db.Uuid
+  texto        String         @db.VarChar(255)
+  preguntaId   String         @db.Uuid
+  pregunta     ExamenPregunta @relation(fields: [preguntaId], references: [id])
+  isCorrecta   ExamenPregunta? @relation("ExamenRespuestaCorrecta")
+}
+
 enum TipoTema {
   EMPRENDEDOR
   PERSONAL
@@ -74,6 +180,18 @@ model Tema {
   tipo        TipoTema    @default(EMPRENDEDOR)
   
   recursos    Recurso[]
+}
+
+model ClaseBonus {
+  id              String    @id @default(uuid()) @db.Uuid
+  titulo          String    @db.VarChar(255)
+  descripcion     String?   @db.Text
+  linkVideo       String    @db.VarChar(255)
+  fechaDisponible DateTime?
+  orden           Int
+  planId       String    @db.Uuid
+   
+  plan         Plan     @relation(fields: [planId], references: [id])
 }
 
 model Recurso {

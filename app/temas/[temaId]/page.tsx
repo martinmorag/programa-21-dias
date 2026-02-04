@@ -88,7 +88,7 @@ export default async function TemaPage({ params }: { params: Props }) {
             {tema.recursos.every(r => r.progreso.length > 0 && r.progreso[0].completado) ? (
               <span className="text-green-600 dark:text-green-400">¡Tema Completado! ✅</span>
             ) : (
-              <span className="text-yellow-600 dark:text-yellow-400">Tema en progreso...</span>
+              <span className="text-yellow-600 dark:text-yellow-400">Tema en progreso</span>
             )}
           </span>
         </div>

@@ -31,20 +31,21 @@ export default function PdfViewerClient({ pdfUrlSegments }: PdfViewerClientProps
   }
 
   return (
-    <div className="w-full h-screen bg-white dark:bg-gray-950 p-4">
-      <div className="mb-4">
-        <button
-          onClick={() => router.back()}
-          className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-medium py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-        >
-          Volver
-        </button>
-      </div>
-      <iframe
-        src={url}
-        className="w-full h-full border-none rounded-lg mt-12"
-        title="PDF Viewer"
-      />
-    </div>
+        <div className="flex flex-col w-full min-h-screen bg-white dark:bg-gray-950 p-4">
+            <div className="mb-4">
+                <button
+                    onClick={() => router.back()}
+                    className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-medium py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                >
+                    Volver
+                </button>
+            </div>
+            {/* The iframe is now a flex item that grows to fill the remaining space */}
+            <iframe
+                src={url}
+                className="w-full flex-1 border-none rounded-lg"
+                title="PDF Viewer"
+            />
+        </div>
   );
 }

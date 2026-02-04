@@ -25,7 +25,11 @@ export async function GET() {
         endDate: { gte: new Date() },
       },
       include: {
-        plan: true,
+        plan: {
+                include: {
+                    clasesBonus: true, // Fetch the bonus classes associated with the plan
+                },
+            },
       },
       orderBy: { endDate: 'desc' },
     });
@@ -98,7 +102,12 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json(temasConProgreso);
+    const responseData = {
+        temas: temasConProgreso,
+        clasesBonus: userSubscription.plan.clasesBonus,
+    };
+
+    return NextResponse.json(responseData);
 
   } catch (error) {
     console.error("Error fetching temas:", error);

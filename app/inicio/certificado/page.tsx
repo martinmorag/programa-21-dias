@@ -3,6 +3,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import CertificateViewer from "@/ui/temas/CertificateViewer";
 
 export const metadata: Metadata = {
@@ -53,6 +55,27 @@ export default async function CertificadoPage() {
     });
     const isEmprendedorCompleted = completedEmprendedorRecursos === totalEmprendedorRecursos;
 
+    const examenIntento = await prisma.examenIntento.findFirst({
+        where: {
+            usuarioId: userId,
+            aprobado: true, // Only get the attempt that passed
+            plan: {
+                code: userPlanCode,
+            },
+        },
+        orderBy: {
+            fechaIntento: 'desc', // Get the most recent completion date
+        },
+    });
+
+    if (!examenIntento) {
+        // If no successful attempt is found, redirect
+        redirect("/inicio?error=no_certificado");
+    }
+
+    const completionDate = examenIntento.fechaIntento;
+    const formattedDate = format(completionDate, "d 'de' MMMM 'de' yyyy", { locale: es });    
+
     // 3. Conditional check and redirect based on the user's plan
     if (userPlanCode === 'emprendedor') {
         if (!isEmprendedorCompleted) {
@@ -62,7 +85,8 @@ export default async function CertificadoPage() {
             <main>
                 <CertificateViewer
                     userName={userName}
-                    isEmprendedorPersonal={false} // Pass `false` for the Emprendedor plan
+                    isEmprendedorPersonal={false}
+                    completionDate={formattedDate}
                 />
             </main>
         );
@@ -95,12 +119,12 @@ export default async function CertificadoPage() {
             <main>
                 <CertificateViewer
                     userName={userName}
-                    isEmprendedorPersonal={true} // Pass `true` for the EmprendedorPersonal plan
+                    isEmprendedorPersonal={true}
+                    completionDate={formattedDate}
                 />
             </main>
         );
     }
     
-    // Default case for invalid plan types
     redirect("/inicio");
 }

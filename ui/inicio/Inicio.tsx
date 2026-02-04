@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Tema } from "@/lib/utils";
+import { ClaseBonus, InicioData, Tema, UserStatus } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 const Inicio: React.FC = () => {
@@ -13,30 +13,35 @@ const Inicio: React.FC = () => {
     const router = useRouter(); 
 
     const [temas, setTemas] = useState<Tema[]>([]);
+    const [clasesBonus, setClasesBonus] = useState<ClaseBonus[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isProgramCompleted, setIsProgramCompleted] = useState(false);
+    const [userStatus, setUserStatus] = useState<UserStatus | null>(null);
 
     useEffect(() => {
         if (status === "authenticated") {
             const fetchTemas = async () => {
                 try {
-                    const completionRes = await fetch('/api/recursos/completion');
-                    if (completionRes.ok) {
-                        const { isCompleted } = await completionRes.json();
-                        setIsProgramCompleted(isCompleted);
+                    const statusRes = await fetch('/api/user/status');
+                    if (statusRes.ok) {
+                        const statusData = await statusRes.json();
+                        setUserStatus(statusData);
+                    } else {
+                        throw new Error("Failed to fetch user status.");
                     }
 
                     const res = await fetch('/api/temas');
                     if (res.status === 403) {
                         setError("no-subscription");
-                        return; // Exit early
+                        return;
                     }
                     if (!res.ok) {
                         throw new Error("Failed to fetch themes.");
                     }
-                    const data = await res.json();
-                    setTemas(data);
+                    const data: InicioData = await res.json();
+                    console.log(data);
+                    setTemas(data.temas);
+                    setClasesBonus(data.clasesBonus);
                 } catch (err: unknown) {
                     if (err instanceof Error) {
                         setError(err.message);
@@ -53,7 +58,7 @@ const Inicio: React.FC = () => {
 
     if (status === "loading" || loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
+            <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
                 <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 dark:border-gray-100"></div>
             </div>
         );
@@ -87,9 +92,72 @@ const Inicio: React.FC = () => {
     const temasEmprendedor = temas.filter(t => t.tipo === 'EMPRENDEDOR');
     const temasPersonal = temas.filter(t => t.tipo === 'PERSONAL');
 
+    if (!userStatus) {
+        return null;
+    }
+
+    const { isProgramCompleted, requiredExamCompleted, examenPersonalCompleto, previouslyCompletedPersonal } = userStatus;
+
+    const renderProgramStatus = () => {
+        if (!isProgramCompleted) {
+            return (
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                        ¡Sigue Adelante, {userFirstName}! 💪
+                    </h2>
+                    <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                        Completa todas las clases y recursos para desbloquear el examen final y obtener tu certificado.
+                    </p>
+                </div>
+            );
+        }
+
+        if (!requiredExamCompleted) {
+            return (
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                        ¡Felicidades! Examen Pendiente 📝
+                    </h2>
+                    <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                        Has completado todos los módulos. ¡Es hora de tomar el examen final para conseguir tu certificado!
+                    </p>
+                    <Link href="/temas/examen" legacyBehavior>
+                        <a className="mt-6 inline-block px-8 py-4 bg-yellow-600 text-white font-semibold rounded-lg shadow-lg hover:bg-yellow-700 transition-colors duration-300">
+                            Tomar Examen Final
+                        </a>
+                    </Link>
+                </div>
+            );
+        }
+
+        return (
+            <div className="text-center mb-16">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                    ¡Felicidades, {userFirstName}! 🎉
+                </h2>
+                <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                    Has completado el programa y aprobado el examen.
+                </p>
+
+                <Link href={`/inicio/certificado?plan=${userStatus.currentPlanCode}`} legacyBehavior>
+                    <a className="mt-6 mx-2 inline-block px-8 py-4 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition-colors duration-300">
+                        Ver Certificado Actual
+                    </a>
+                </Link>
+
+                {previouslyCompletedPersonal && examenPersonalCompleto && (
+                    <Link href={`/inicio/certificado?plan=emprendedorpersonal`} legacyBehavior>
+                        <a className="mt-6 mx-2 inline-block px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-colors duration-300">
+                            Ver Certificado Personal (Previo)
+                        </a>
+                    </Link>
+                )}
+            </div>
+        );
+    };
+
     return (
         <div className="bg-gray-50 dark:bg-gray-900 transition-colors duration-300 min-h-screen">
-            {/* Sección de Bienvenida (Hero) */}
             <div className="relative w-full h-96 flex items-center justify-center text-white">
                 <Image
                     src="/background.jpg"
@@ -108,21 +176,7 @@ const Inicio: React.FC = () => {
             </div>
 
             <main className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-                {isProgramCompleted && (
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                            ¡Felicidades, {userFirstName}! 🎉
-                        </h2>
-                        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                            Has completado el programa con éxito. Descarga tu certificado.
-                        </p>
-                        <Link href="/inicio/certificado" legacyBehavior>
-                            <a className="mt-6 inline-block px-8 py-4 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition-colors duration-300">
-                                Ver y Descargar Certificado
-                            </a>
-                        </Link>
-                    </div>
-                )}
+                {renderProgramStatus()}
                 {/* Sección de Clases */}
                 <section className="text-center mb-16">
                     <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
@@ -191,6 +245,36 @@ const Inicio: React.FC = () => {
                                             </span>
                                         </div>
                                     </Link>
+                                ))}
+                            </div>
+                        </>
+                    )}
+
+                    {clasesBonus.length > 0 && (
+                        <>
+                            <hr className="my-16 border-gray-200 dark:border-gray-700" />
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                                Clases de Bonificación Exclusivas ✨
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                {clasesBonus.map((clase) => (
+                                    <div 
+                                        key={clase.id} 
+                                        className="p-6 rounded-xl shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col items-start text-left"
+                                    >
+                                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                                            {clase.titulo}
+                                        </h3>
+                                        <p className="mt-2 text-gray-600 dark:text-gray-400">
+                                            {clase.descripcion}
+                                        </p>
+                                        <Link
+                                            href={`/temas/bonus/${clase.id}`} // Use a dynamic link with the class ID
+                                            className="mt-4 inline-block px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition"
+                                        >
+                                            Ver Clase Ahora
+                                        </Link>
+                                    </div>
                                 ))}
                             </div>
                         </>

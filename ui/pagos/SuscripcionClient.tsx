@@ -16,7 +16,7 @@ export default function SuscripcionClient() {
           title: '¡Pago Exitoso!',
           message: 'Tu suscripción ha sido confirmada. Ya puedes acceder a todo nuestro contenido.',
           buttonText: 'Ir a mi Panel',
-          buttonLink: '/dashboard',
+          buttonLink: '/inicio',
           buttonClass: 'bg-green-600 hover:bg-green-700',
         };
       case 'pendiente':
@@ -25,7 +25,7 @@ export default function SuscripcionClient() {
           title: 'Pago Pendiente',
           message: 'Estamos esperando la confirmación de tu pago. Te notificaremos cuando esté listo.',
           buttonText: 'Ir a la Página de Planes',
-          buttonLink: '/planes',
+          buttonLink: '/inicio/planes',
           buttonClass: 'bg-yellow-600 hover:bg-yellow-700',
         };
       case 'fallido':
@@ -34,7 +34,7 @@ export default function SuscripcionClient() {
           title: 'Pago Fallido',
           message: 'Ocurrió un problema con tu pago. Por favor, intenta de nuevo o contacta a soporte.',
           buttonText: 'Intentar de Nuevo',
-          buttonLink: '/planes',
+          buttonLink: '/inicio/planes',
           buttonClass: 'bg-red-600 hover:bg-red-700',
         };
       default:

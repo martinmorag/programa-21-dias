@@ -39,7 +39,7 @@ const Header: React.FC = () => {
     return (
         <header className="top-0 left-0 right-0 z-50 flex items-center justify-between p-4 sm:px-8 h-16 bg-white dark:bg-gray-900 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
             <div className="flex items-center gap-4">
-                <Link href={inicioHref} className="flex items-center gap-2">
+                <Link href='/' className="flex items-center gap-2">
                     <Image
                         src="/logo_21.png"
                         alt="Logo"

@@ -2,7 +2,6 @@
 
 import React from "react";
 import { ReactNode } from "react";
-import Footer from "@/ui/general/Footer";
 
 interface LayoutProps {
     children: ReactNode;
@@ -14,7 +13,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <main className="flex-grow">
                 {children}
             </main>
-            <Footer />
         </div>
     );
 }

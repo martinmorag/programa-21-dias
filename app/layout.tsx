@@ -7,6 +7,7 @@ import { Providers } from "@/ui/auth/Providers"
 
 import { usePathname } from "next/navigation";
 import WhatsappButton from "@/ui/general/WhatsappButton";
+import Footer from "@/ui/general/Footer";
 
 export default function RootLayout({
   children,
@@ -24,6 +25,7 @@ export default function RootLayout({
           <Header />
           {children}
           {shouldShowWhatsappButton && <WhatsappButton />}
+          <Footer />
         </Providers>
       </body>
     </html>

@@ -60,6 +60,28 @@ export type Tema = {
   recursos: Recurso[];
 };
 
+export interface ClaseBonus {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  linkVideo: string;
+  fechaDisponible: string | null;
+}
+
+export interface UserStatus {
+  currentPlanCode: string | null;
+  isProgramCompleted: boolean;
+  requiredExamCompleted: boolean;
+  examenEmprendedorCompleto: boolean;
+  examenPersonalCompleto: boolean;
+  previouslyCompletedPersonal: boolean;
+}
+
+export interface InicioData {
+  temas: Tema[];
+  clasesBonus: ClaseBonus[];
+}
+
 
 
 
@@ -113,6 +135,20 @@ export type ProgresoRecurso = {
 
 
 
+// Bonus page
+
+export type ClaseBonusType = {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  linkVideo: string;
+  orden: number;
+};
+
+
+
+
+
 
 // Payments
 
@@ -121,4 +157,63 @@ export interface Plan {
   name: string;
   price: number;
   code: string;
+}
+
+
+
+// Examen
+
+export interface ExamenData {
+    planCode: string;
+    preguntas: ExamenPregunta[];
+}
+
+export interface ExamenPregunta {
+  id: string;
+  pregunta: string;
+  opciones: Opcion[];
+  respuestaCorrectaId: string;
+}
+
+export interface CertificateProps {
+  userName: string;
+  isEmprendedorPersonal: boolean;
+  completionDate: string;
+}
+
+
+
+
+
+
+
+export interface Package {
+  id: string,
+  ETA: string,
+  weight: number,
+  fragile: boolean,
+  dispatchDate: string,
+  notes: string | null,
+}
+
+export interface PackageStatus {
+  id: string,
+  arrived: string,
+  canceled: string,
+  transit: string,
+  package: Package[],
+}
+
+export interface Location {
+  id: string,
+  name: string,
+  location: Package[],
+  origin: Package[],
+}
+
+
+export interface Address {
+  id: string,
+  name: string,
+  package: Package[],
 }

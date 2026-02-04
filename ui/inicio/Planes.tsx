@@ -36,7 +36,7 @@ const Planes: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
         <FaSpinner className="animate-spin text-4xl text-gray-900 dark:text-gray-100" />
       </div>
     );
